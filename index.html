@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مغامرة الحروف العربية - كتاب فنار</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #E3F2FD 0%, #FFF8E1 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      color: #263238;
+    }
+    .game-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 650px;
+      border-radius: 25px;
+      border: 5px solid #0288D1;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      padding: 25px;
+      text-align: center;
+    }
+    h1 {
+      color: #01579B;
+      font-size: 1.9rem;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #546E7A;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      background: #E1F5FE;
+      padding: 12px 20px;
+      border-radius: 15px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #0277BD;
+      margin-bottom: 20px;
+    }
+    .unit-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    .unit-btn {
+      background: #FF9800;
+      color: white;
+      border: none;
+      padding: 18px 12px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #E65100;
+      transition: transform 0.1s;
+    }
+    .unit-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #E65100;
+    }
+    .unit-btn.u1 { background: #4CAF50; box-shadow: 0 5px 0 #2E7D32; }
+    .unit-btn.u2 { background: #2196F3; box-shadow: 0 5px 0 #1565C0; }
+    .unit-btn.u3 { background: #9C27B0; box-shadow: 0 5px 0 #6A1B9A; }
+    .unit-btn.all { background: #FF5722; box-shadow: 0 5px 0 #BF360C; }
+
+    #quiz-screen, #end-screen { display: none; }
+
+    .question-card {
+      background: #FFFDE7;
+      border: 3px dashed #FBC02D;
+      border-radius: 20px;
+      padding: 25px 15px;
+      margin-bottom: 20px;
+    }
+    .emoji-display {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+    .question-text {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #37474F;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .option-btn {
+      background: #F5F5F5;
+      border: 3px solid #CFD8DC;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 1.7rem;
+      font-weight: bold;
+      color: #263238;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .option-btn:hover {
+      background: #E1F5FE;
+      border-color: #03A9F4;
+    }
+    .option-btn.correct {
+      background: #C8E6C9;
+      border-color: #4CAF50;
+      color: #1B5E20;
+    }
+    .option-btn.wrong {
+      background: #FFCDD2;
+      border-color: #F44336;
+      color: #B71C1C;
+    }
+    #feedback {
+      margin-top: 15px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      min-height: 35px;
+    }
+    .home-btn {
+      margin-top: 20px;
+      background: #607D8B;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-box">
+    <!-- Start Menu -->
+    <div id="menu-screen">
+      <h1>🌟 مغامرة الحروف العربية 🌟</h1>
+      <p class="subtitle">اختر الوحدة لتبدأ اللعب والتعلم!</p>
+      <div class="unit-buttons">
+        <button class="unit-btn u1" onclick="startGame('u1')">الوحدة الأولى<br>( ب ، ف ، م ، و )</button>
+        <button class="unit-btn u2" onclick="startGame('u2')">الوحدة الثانية<br>( ث ، ذ ، ظ )</button>
+        <button class="unit-btn u3" onclick="startGame('u3')">الوحدة الثالثة<br>( ت ، د ، ط ، ض )</button>
+        <button class="unit-btn all" onclick="startGame('all')">تحدي كل الوحدات!<br>🏆</button>
+      </div>
+    </div>
+
+    <!-- Quiz Gameplay -->
+    <div id="quiz-screen">
+      <div class="top-bar">
+        <span>⭐ النقاط: <span id="score">0</span></span>
+        <span>السؤال: <span id="q-num">1</span> / <span id="q-total">10</span></span>
+      </div>
+
+      <div class="question-card">
+        <div class="emoji-display" id="q-emoji">🐄</div>
+        <div class="question-text" id="q-text">ما الحرف الأول لكلمة ( بَقَرَة )؟</div>
+      </div>
+
+      <div class="options-grid" id="options-container"></div>
+      <div id="feedback"></div>
+      <button class="home-btn" onclick="goHome()">🏠 القائمة الرئيسية</button>
+    </div>
+
+    <!-- Game Over / Celebration Screen -->
+    <div id="end-screen">
+      <div class="emoji-display">🎉🏆🎉</div>
+      <h1>أحسنت يا بطل!</h1>
+      <p class="question-text" style="margin: 20px 0;">لقد جمعت <span id="final-score" style="color:#E65100;">0</span> نجمة!</p>
+      <button class="unit-btn u1" style="width:100%;" onclick="goHome()">العب مرة أخرى 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // Question bank directly extracted from Fanar Level 1 Book (Units 1, 2, 3)
+    const questionBank = {
+      u1: [
+        { emoji: "🐄", q: "بـَـقَـرَة : ما الحرف الناقص؟ ( ـقَـرَة )", options: ["ب", "ف", "م", "و"], answer: "ب" },
+        { emoji: "🐎", q: "فَـرَس : ما الحرف الأول؟", options: ["ف", "ب", "و", "م"], answer: "ف" },
+        { emoji: "🔑", q: "مِـفْـتَـاح : ما الحرف الأول؟", options: ["م", "ف", "ب", "و"], answer: "م" },
+        { emoji: "🌹", q: "وَرْدَة : ما الحرف الأول؟", options: ["و", "م", "ب", "ف"], answer: "و" },
+        { emoji: "📖", q: "اختر الإشارة الصحيحة: ...... كِتَاب.", options: ["هَذَا", "هَذِهِ"], answer: "هَذَا" },
+        { emoji: "🍎", q: "اختر الإشارة الصحيحة: ...... تُفَّاحَة.", options: ["هَذِهِ", "هَذَا"], answer: "هَذِهِ" },
+        { emoji: "🦆", q: "بَـطَّـة : ما الحركة المناسبة لحرف الباء؟", options: ["بَ", "بُ", "بِ"], answer: "بَ" },
+        { emoji: "🐘", q: "فِـيـل : ما الحركة المناسبة لحرف الفاء؟", options: ["فِ", "فَ", "فُ"], answer: "فِ" },
+        { emoji: "🐪", q: "جَـمَـل : أين يوجد حرف الميم؟", options: ["وسط الكلمة", "أول الكلمة", "آخر الكلمة"], answer: "وسط الكلمة" },
+        { emoji: "🪣", q: "دَلْـو : ما الحرف الأخير؟", options: ["و", "م", "ب", "ف"], answer: "و" }
+      ],
+      u2: [
+        { emoji: "🦊", q: "ثَـعْـلَـب : ما الحرف الأول؟", options: ["ث", "ذ", "ظ", "ب"], answer: "ث" },
+        { emoji: "🐺", q: "ذِئْـب : ما الحرف الأول؟", options: ["ذ", "ث", "ظ", "د"], answer: "ذ" },
+        { emoji: "✉️", q: "ظَـرْف : ما الحرف الأول؟", options: ["ظ", "ذ", "ث", "ط"], answer: "ظ" },
+        { emoji: "👓", q: "اختر الإشارة الصحيحة: ...... نَظَّارَة.", options: ["هَذِهِ", "هَذَا"], answer: "هَذِهِ" },
+        { emoji: "👞", q: "اختر الإشارة الصحيحة: ...... حِذَاء.", options: ["هَذَا", "هَذِهِ"], answer: "هَذَا" },
+        { emoji: "🐍", q: "ثُـعْـبَـان : ما الحركة المناسبة لحرف الثاء؟", options: ["ثُ", "ثَ", "ثِ"], answer: "ثُ" },
+        { emoji: "🌽", q: "ذُرَة : ما الحرف الأول؟", options: ["ذ", "ظ", "ث", "ز"], answer: "ذ" },
+        { emoji: "🦔", q: "قُـنْـفُـذ : ما الحرف الأخير؟", options: ["ذ", "ث", "ظ", "ف"], answer: "ذ" }
+      ],
+      u3: [
+        { emoji: "🐊", q: "تِـمْـسَـاح : ما الحرف الأول؟", options: ["ت", "د", "ط", "ض"], answer: "ت" },
+        { emoji: "🐓", q: "دِيـك : ما الحرف الأول؟", options: ["د", "ت", "ط", "ض"], answer: "د" },
+        { emoji: "✈️", q: "طَـائِـرَة : ما الحرف الأول؟", options: ["ط", "ت", "د", "ض"], answer: "ط" },
+        { emoji: "🐸", q: "ضِـفْـدَع : ما الحرف الأول؟", options: ["ض", "ط", "د", "ت"], answer: "ض" },
+        { emoji: "⚽⚽⚽⚽", q: "كَمْ كُرَةً فِي الصُّورَةِ؟", options: ["أَرْبَعَة (4)", "ثَلَاثَة (3)", "خَمْسَة (5)", "اِثْنَان (2)"], answer: "أَرْبَعَة (4)" },
+        { emoji: "🥚🥚🥚🥚🥚", q: "كَمْ بَيْضَةً فِي الصُّورَةِ؟", options: ["خَمْسَة (5)", "سِتَّة (6)", "أَرْبَعَة (4)", "سَبْعَة (7)"], answer: "خَمْسَة (5)" },
+        { emoji: "🐱", q: "قِـطّ : ما الحرف الأخير؟", options: ["ط", "ت", "ض", "د"], answer: "ط" },
+        { emoji: "🏠", q: "بَـيْـت : ما الحرف الأخير؟", options: ["ت", "ط", "د", "ب"], answer: "ت" }
+      ]
+    };
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let canAnswer = true;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame(unit) {
+      let pool = [];
+      if (unit === 'all') {
+        pool = [...questionBank.u1, ...questionBank.u2, ...questionBank.u3];
+      } else {
+        pool = [...questionBank[unit]];
+      }
+
+      currentQuestions = shuffle(pool).slice(0, 10);
+      currentIndex = 0;
+      score = 0;
+
+      document.getElementById('score').textContent = score;
+      document.getElementById('q-total').textContent = currentQuestions.length;
+      document.getElementById('menu-screen').style.display = 'none';
+      document.getElementById('end-screen').style.display = 'none';
+      document.getElementById('quiz-screen').style.display = 'block';
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      canAnswer = true;
+      const item = currentQuestions[currentIndex];
+      document.getElementById('q-num').textContent = currentIndex + 1;
+      document.getElementById('q-emoji').textContent = item.emoji;
+      document.getElementById('q-text').textContent = item.q;
+      document.getElementById('feedback').textContent = "";
+
+      const container = document.getElementById('options-container');
+      container.innerHTML = '';
+
+      const shuffledOptions = shuffle([...item.options]);
+      shuffledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt, item.answer);
+        container.appendChild(btn);
+      });
